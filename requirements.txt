@@ -1,0 +1,4 @@
+# Cross-platform library for monitoring systems and processes
+psutil==5.6.3
+# Managing HTTP requests
+requests==2.22.0
