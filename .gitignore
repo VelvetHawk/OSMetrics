@@ -1,5 +1,8 @@
-# Ignore environment
+# Environment
 venv/
 
-# Ignore Pycharm config
+# Pycharm config
 .idea/
+
+# Byte-compiled files
+__pycache__/
