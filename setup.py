@@ -1,13 +1,13 @@
-from setuptools import setup, find_packages
+import setuptools
 
 with open("README.md", "r") as file:
 	long_description = file.read()
 
-setup(
+setuptools.setup(
 	name="OS Metrics",
 	version="0.1",
 	author="Artem Semenov",
-	packages=find_packages(),
+	packages=setuptools.find_packages(),
 	description="Package to collect OS metrics",
 	long_description=long_description,
 	long_description_content_type="text/markdown",
