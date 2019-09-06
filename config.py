@@ -5,6 +5,7 @@ KAFKA_PORT = os.getenv("KAFKA_PORT")
 KAFKA_SSL_CA_FILE = os.getenv("KAFKA_SSL_CA_FILE")
 KAFKA_SSL_CERT_FILE = os.getenv("KAFKA_SSL_CERT_FILE")
 KAFKA_SSL_KEY_FILE = os.getenv("KAFKA_SSL_KEY_FILE")
+KAFKA_TOPIC_NAME = os.getenv("KAFKA_TOPIC_NAME")
 
 PG_HOST = os.getenv("PG_HOST")
 PG_PORT = os.getenv("PG_PORT")
