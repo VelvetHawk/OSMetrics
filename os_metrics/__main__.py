@@ -22,7 +22,7 @@ stop_task = False
 # Get basic OS information
 os_name = platform.system()
 os_release = platform.release()
-os_architecture = "%s (%s)".format(platform.architecture()[0], platform.machine())
+os_architecture = "{} ({})".format(platform.architecture()[0], platform.machine())
 os_version = platform.version()
 
 # Get information about processor and memory
