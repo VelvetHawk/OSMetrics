@@ -37,7 +37,7 @@ PG_SSL_CA_FILE | path/to/file
 You can then run the `os_metrics` module directly
 by using:
 ```
-python os_metrics
+python -m os_metrics
 ```
 It will continue to run indefinitely until a
 keyboard interrupt is issued.
@@ -49,7 +49,7 @@ python -m unittest discover
 ```
 or specify the `tests` module directly:
 ```
-python tests
+python -m tests
 ```
 All tests must be prefixed with a `test_`
 prefix.
