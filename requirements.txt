@@ -4,3 +4,5 @@ psutil==5.6.3
 requests==2.22.0
 # Async-await support for requests
 requests-async==0.6.2
+# Apache kafka support in python
+kafka-python==1.4.6
