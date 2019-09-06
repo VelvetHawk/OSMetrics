@@ -58,6 +58,7 @@ i = 0
 while i < 10:
 	producer.send_metrics()
 	consumer.consume()
+	i += 1
 	time.sleep(1)  # Sleep 1 second
 
 # Close connections and stop producer/consumer
