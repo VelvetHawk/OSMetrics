@@ -4,6 +4,8 @@
 # Producer code sourced from:
 # https://help.aiven.io/en/articles/489572-getting-started-with-aiven-kafka
 
+import json
+
 import psutil
 import kafka
 
@@ -41,4 +43,17 @@ class Producer:
 		self.memory_percentages = [psutil.virtual_memory().percent, psutil.swap_memory().percent]
 
 	def send_metrics(self):
-		pass
+		"""
+		Collect metrics and send them to the given Kafka Topic
+		"""
+		self.get_cpu_metrics()
+		self.get_memory_metrics()
+		message = {
+			'cpu_metrics': self.cpu_percentages,
+			'memory_metrics': self.memory_percentages
+		}
+		self.producer.send(self.kafka_topic, json.dumps(message).encode("utf-8"))
+		print(message)
+
+	def stop(self):
+		self.producer.close(timeout=None)
