@@ -1,47 +1,23 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
+#!/usr/bin/env python3
 
-"""This module extracts OS metrics and streams them asynchronously
-to apache kafka in 1 second intervals."""
+"""
+This module uses a Kafka Producer to extract metrics from the current operating
+system and send them to a Kafka Topic, where a Kafka Consumer then takes those
+messages and logs them to a PostgreSQL database
+"""
 
 import platform
+import time
 
-import requests
-import requests_async
 import psutil
-import asyncio
+
+from os_metrics import producer
+from os_metrics import consumer
+import config
 
 
 # Control for event loop task
 stop_task = False
-
-
-@asyncio.coroutine
-async def get_cpu_metrics() -> list:
-	"""
-	Gets the utilisation percentage and temperature for each CPU
-	:return:
-	"""
-	pass
-
-
-async def get_memory_metrics() -> list:
-	"""
-	Gets the utilisation percentage for both virtual memory and
-	swap space on the target OS
-	:return:
-	"""
-	pass
-
-
-async def stream_metrics():
-	"""
-	Send data to apache kafka instance in 1 second intervals
-	:return:
-	"""
-	while not stop_task:
-		print("Working...")
-		await asyncio.sleep(1)
 
 # Get basic OS information
 os_name = platform.system()
@@ -56,13 +32,34 @@ cpu_logical_cores = psutil.cpu_count(logical=True)
 total_ram = psutil.virtual_memory().total
 total_swap_space = psutil.swap_memory().total
 
-# Collect and stream data
-loop = asyncio.get_event_loop()
-try:
-	loop.run_until_complete(stream_metrics())
-except KeyboardInterrupt as interrupt:
-	# Allow keyboard interrupts to stop loop
-	stop_task = True
-finally:
-	# End loop and close all connections
-	loop.close()
+# Create Kafka Producer and create connection to topic
+producer = producer.Producer(
+	host=config.KAFKA_HOST,
+	port=config.KAFKA_PORT,
+	ca_file=config.KAFKA_SSL_CA_FILE,
+	cert_file=config.KAFKA_SSL_CERT_FILE,
+	key_file=config.KAFKA_SSL_KEY_FILE,
+	kafka_topic=config.KAFKA_TOPIC_NAME
+)
+
+# Create Kafka Consumer and create connection to topic
+consumer = consumer.Consumer(
+	host=config.KAFKA_HOST,
+	port=config.KAFKA_PORT,
+	ca_file=config.KAFKA_SSL_CA_FILE,
+	cert_file=config.KAFKA_SSL_CERT_FILE,
+	key_file=config.KAFKA_SSL_KEY_FILE,
+	kafka_topic=config.KAFKA_TOPIC_NAME,
+	service_uri=config.PG_SERVICE_URI
+)
+
+# Run for 10 seconds, with 1 second intervals
+i = 0
+while i < 10:
+	producer.send_metrics()
+	consumer.consume()
+	time.sleep(1)  # Sleep 1 second
+
+# Close connections and stop producer/consumer
+producer.stop()
+consumer.stop()
