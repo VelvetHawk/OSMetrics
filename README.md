@@ -39,8 +39,8 @@ by using:
 ```
 python -m os_metrics
 ```
-It will continue to run indefinitely until a
-keyboard interrupt is issued.
+Currently to set to run for ~10 seconds
+before exiting.
 
 ## Testing
 Discover and run all tests automatically:
