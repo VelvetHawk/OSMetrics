@@ -22,7 +22,7 @@ stop_task = False
 # Get basic OS information
 os_name = platform.system()
 os_release = platform.release()
-os_architecture = "%s (%s)" % (platform.architecture()[0], platform.machine())
+os_architecture = "%s (%s)".format(platform.architecture()[0], platform.machine())
 os_version = platform.version()
 
 # Get information about processor and memory
@@ -56,7 +56,7 @@ consumer = consumer.Consumer(
 # Run for 10 seconds, with 1 second intervals
 i = 0
 while i < 10:
-	producer.send_metrics()
+	# producer.send_metrics()
 	consumer.consume()
 	i += 1
 	time.sleep(1)  # Sleep 1 second
