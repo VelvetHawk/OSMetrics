@@ -6,10 +6,7 @@ system and send them to a Kafka Topic, where a Kafka Consumer then takes those
 messages and logs them to a PostgreSQL database
 """
 
-import platform
 import time
-
-import psutil
 
 from os_metrics import producer
 from os_metrics import consumer
@@ -18,19 +15,6 @@ import config
 
 # Control for event loop task
 stop_task = False
-
-# Get basic OS information
-os_name = platform.system()
-os_release = platform.release()
-os_architecture = "{} ({})".format(platform.architecture()[0], platform.machine())
-os_version = platform.version()
-
-# Get information about processor and memory
-processor = platform.processor()
-cpu_physical_cores = psutil.cpu_count(logical=False)
-cpu_logical_cores = psutil.cpu_count(logical=True)
-total_ram = psutil.virtual_memory().total
-total_swap_space = psutil.swap_memory().total
 
 # Create Kafka Producer and create connection to topic
 producer = producer.Producer(
