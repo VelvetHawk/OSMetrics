@@ -19,8 +19,24 @@ class Consumer:
 			kafka_topic,
 			auto_offset_reset="earliest",
 			bootstrap_servers="{}:{}".format(host, port),
+			group_id="python-test",
 			security_protocol="SSL",
 			ssl_cafile=ca_file,
 			ssl_certfile=cert_file,
 			ssl_keyfile=key_file,
 		)
+
+	def consume(self):
+		"""
+		Check the Kafka Topic for new messages and if present,
+		send to the PostgreSQL database
+		"""
+		raw_messages = self.consumer.poll(timeout_ms=1000)
+		for topic, messages in raw_messages.items():
+			print("Topic: {}".format(topic))
+			for message in messages:
+				print("Message: {}".format(message))
+		self.consumer.commit()
+
+	def stop(self):
+		self.consumer.close()
