@@ -4,6 +4,7 @@
 # Producer code sourced from:
 # https://help.aiven.io/en/articles/489572-getting-started-with-aiven-kafka
 
+import platform
 import json
 
 import psutil
@@ -28,6 +29,19 @@ class Producer:
 		self.kafka_topic = kafka_topic
 		self.cpu_percentages = None
 		self.memory_percentages = None
+
+		# Get basic OS information
+		self.os_name = platform.system()
+		self.os_release = platform.release()
+		self.os_architecture = "{} ({})".format(platform.architecture()[0], platform.machine())
+		self.os_version = platform.version()
+
+		# Get information about processor and memory
+		self.processor = platform.processor()
+		self.cpu_physical_cores = psutil.cpu_count(logical=False)
+		self.cpu_logical_cores = psutil.cpu_count(logical=True)
+		self.total_ram = psutil.virtual_memory().total
+		self.total_swap_space = psutil.swap_memory().total
 
 	def get_cpu_metrics(self):
 		"""
