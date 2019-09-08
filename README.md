@@ -14,6 +14,8 @@ For the Apache Kafka Producer and Consumer:
 
 Name          | Value
 :---: |:---:
+KAFKA_PRODUCER_ID | Client ID for the Kafka Producer
+KAFKA_CONSUMER_ID | Client ID for the Kafka Consumer
 KAFKA_HOST | Address of the host for the Kafka server
 KAFKA_PORT | Port number
 KAFKA_SSL_CA_FILE | path/to/file 
@@ -53,3 +55,8 @@ python -m tests
 ```
 All tests must be prefixed with a `test_`
 prefix.
+
+## Logging
+Default logging level is `DEBUG` and the
+default output stream is configured for
+`stdout`.
