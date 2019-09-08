@@ -18,6 +18,7 @@ stop_task = False
 
 # Create Kafka Producer and create connection to topic
 producer = producer.Producer(
+	client_id=config.KAFKA_PRODUCER_ID,
 	host=config.KAFKA_HOST,
 	port=config.KAFKA_PORT,
 	ca_file=config.KAFKA_SSL_CA_FILE,
@@ -28,6 +29,7 @@ producer = producer.Producer(
 
 # Create Kafka Consumer and create connection to topic
 consumer = consumer.Consumer(
+	client_id=config.KAFKA_CONSUMER_ID,
 	host=config.KAFKA_HOST,
 	port=config.KAFKA_PORT,
 	ca_file=config.KAFKA_SSL_CA_FILE,
@@ -37,10 +39,15 @@ consumer = consumer.Consumer(
 	service_uri=config.PG_SERVICE_URI
 )
 
+# Register machine details in Kafka Topic
+producer.register_machine()
+# Transfer details into database
+consumer.consume()
+
 # Run for 10 seconds, with 1 second intervals
 i = 0
 while i < 10:
-	# producer.send_metrics()
+	producer.send_metrics()
 	consumer.consume()
 	i += 1
 	time.sleep(1)  # Sleep 1 second
