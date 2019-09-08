@@ -1,17 +1,30 @@
-CREATE TABLE OPERATING_SYSTEMS (
-    ID INT PRIMARY KEY NOT NULL,
-    NAME VARCHAR(255) NOT NULL,
-    RELEASE VARCHAR(255) NOT NULL,
-    ARCHITECTURE VARCHAR(255) NOT NULL,
-    VERSION VARCHAR(255) NOT NULL,
-    PROCESSOR VARCHAR(255) NOT NULL,
-    PHYYSICAL_CORES INT NOT NULL,
-    LOGICAL_CORES INT NOT NULL,
-    TOTAL_RAM INT NOT NULL,
-    TOTAL_SWAPSPACE INT NOT NULL
+CREATE TABLE operating_systems (
+    id VARCHAR(100) PRIMARY KEY NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    release VARCHAR(255) NOT NULL,
+    architecture VARCHAR(255) NOT NULL,
+    version VARCHAR(255) NOT NULL,
+    processor VARCHAR(255) NOT NULL,
+    physical_cores INT NOT NULL,
+    logical_cores INT NOT NULL,
+    total_ram BIGINT NOT NULL,
+    total_swapspace BIGINT NOT NULL
 );
 
-CREATE TABLE METRICS (
-    ID INT PRIMARY KEY NOT NULL,
-    OPERATING_SYSTEM INT REFERENCES OPERATING_SYSTEMS(ID),
+CREATE TABLE cpu_metrics (
+    id SERIAL PRIMARY KEY NOT NULL,
+    producer_id VARCHAR(100) NOT NULL,
+    date_time TIMESTAMP NOT NULL,
+    operating_system VARCHAR(100) REFERENCES operating_systems(id),
+    core INT NOT NULL,
+    load_percentage FLOAT NOT NULL
+);
+
+CREATE TABLE memory_metrics (
+    id SERIAL PRIMARY KEY NOT NULL,
+    producer_id VARCHAR(100) NOT NULL,
+    date_time TIMESTAMP NOT NULL,
+    operating_system VARCHAR(100) REFERENCES operating_systems(id),
+    ram_load_percentage FLOAT NOT NULL,
+    swap_load_percentage FLOAT NOT NULL
 );
