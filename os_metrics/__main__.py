@@ -45,11 +45,9 @@ producer.register_machine()
 consumer.consume()
 
 # Run for 10 seconds, with 1 second intervals
-i = 0
-while i < 10:
+for _ in range(10):
 	producer.send_metrics()
 	consumer.consume()
-	i += 1
 	time.sleep(1)  # Sleep 1 second
 
 # Close connections and stop producer/consumer
