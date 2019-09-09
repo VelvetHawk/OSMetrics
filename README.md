@@ -5,9 +5,20 @@ Apache Kafka Producer to a Kafka Topic where
 a Kafka Consumer will extract the data from the
 topic and log it into a PostgreSQL database.
 
-## Running
-Before you run the code, make sure to set the
-following environment variables in your
+## Setup
+To install the module locally (since it's not on PyPI), use:
+```
+python setup.py install
+```
+
+If you need to later install requirements manually, you 
+can use:
+```
+pip install -r requirements.txt
+```
+
+Before you run the code, make sure to also set
+the following environment variables in your
 environment or your IDE:
 
 For the Apache Kafka Producer and Consumer:
@@ -35,7 +46,7 @@ PG_DB_USER | Name of the user account
 PG_USER_PASSWORD | User account password
 PG_SSL_CA_FILE | path/to/file
   
-
+## Running
 You can then run the `os_metrics` module directly
 by using:
 ```
