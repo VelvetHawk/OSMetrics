@@ -19,8 +19,8 @@ class Consumer:
 	specified PostegreSQL database
 	"""
 
-	def __init__(self, client_id, host, port, ca_file, cert_file, key_file, kafka_topic,
-			service_uri):
+	def __init__(self, client_id, host, port, ca_file, cert_file, key_file,
+					kafka_topic, service_uri):
 		self.consumer = kafka.KafkaConsumer(
 			kafka_topic,
 			client_id=client_id,
@@ -35,10 +35,10 @@ class Consumer:
 		self.db_connection = psycopg2.connect(service_uri)
 		self.cursor = self.db_connection.cursor(cursor_factory=RealDictCursor)
 
-	def consume(self):
+	def consume(self) -> None:
 		"""
 		Check the Kafka Topic for new messages and if present,
-		send to the PostgreSQL database
+		send to the database
 		"""
 		raw_messages = self.consumer.poll(timeout_ms=1000)
 		for topic, messages in raw_messages.items():
@@ -48,69 +48,87 @@ class Consumer:
 				logger.debug("C Message: {}".format(metrics))
 				# Check message types, case insensitive
 				if metrics['type'].lower() == "log":
-					# For each CPU core, add a separate entry to database
-					i = 0
-					for cpu in metrics['content']['cpu_metrics']:
-						self.cursor.execute(
-							"INSERT INTO cpu_metrics"
-							"(producer_id, date_time, operating_system, core, load_percentage)"
-							" values "
-							"('{}', NOW() AT TIME ZONE 'UTC', '{}', {}, {});".format(
-								metrics['content']['producer_id'],
-								metrics['content']['mac_id'],
-								i,
-								cpu
-							)
-						)
-						self.db_connection.commit()
-						i += 1
-					# Add memory metrics to database
-					query = \
-						"INSERT INTO memory_metrics" \
-						"(producer_id, date_time, operating_system, ram_load_percentage," \
-						"swap_load_percentage)" \
-						" values " \
-						"('{}', NOW() AT TIME ZONE 'UTC', '{}', {}, {});".format(
-							metrics['content']['producer_id'],
-							metrics['content']['mac_id'],
-							metrics['content']['memory_metrics'][0],
-							metrics['content']['memory_metrics'][1]
-						)
-					logger.debug("Query: {}".format(query))
-					self.cursor.execute(query)
-					self.db_connection.commit()
-					# result = self.cursor.fetchone()
-					# print("Result: {}".format(result))
+					self.create_log_entry(metrics)
 				elif metrics['type'].lower() == "registration":
-					self.cursor.execute("SELECT * FROM operating_systems WHERE "
-										"id='{}'".format(metrics['content']['mac_id']))
-					result = self.cursor.fetchone()
-					logger.debug("OS Result: {}".format(result))
-					if not result:
-						query = \
-							"INSERT INTO operating_systems" \
-							"(id, name, release, architecture, version, processor, " \
-							"physical_cores, logical_cores, total_ram, total_swapspace)" \
-							"values" \
-							"('{}', '{}', '{}', '{}', '{}', '{}', {}, {}, {}, {});".format(
-								metrics['content']['mac_id'],
-								metrics['content']['os_name'],
-								metrics['content']['os_release'],
-								metrics['content']['os_architecture'],
-								metrics['content']['os_version'],
-								metrics['content']['processor'],
-								metrics['content']['cpu_physical_cores'],
-								metrics['content']['cpu_logical_cores'],
-								metrics['content']['total_ram'],
-								metrics['content']['total_swap_space'],
-							)
-						logger.debug("Query: {}".format(query))
-						self.cursor.execute(query)
-						self.db_connection.commit()
-						# result = self.cursor.fetchone()
-						# print("Result: {}".format(result))
+					self.create_registration_entry(metrics)
+
 		# Flush any lingering messages
 		self.consumer.commit()
 
-	def stop(self):
+	def create_log_entry(self, metrics) -> None:
+		"""
+		Take the data from the Kafka Topic and send it to the
+		database as log entries for cpu and memory
+		:param metrics: A dict object containing the cpu
+			and memory metrics
+		"""
+		# For each CPU core, add a separate entry to database
+		i = 0
+		for cpu in metrics['content']['cpu_metrics']:
+			self.cursor.execute(
+				"INSERT INTO cpu_metrics"
+				"(producer_id, date_time, operating_system, core, load_percentage)"
+				" values "
+				"('{}', NOW() AT TIME ZONE 'UTC', '{}', {}, {});".format(
+					metrics['content']['producer_id'],
+					metrics['content']['mac_id'],
+					i,
+					cpu
+				)
+			)
+			self.db_connection.commit()
+			i += 1
+		# Add memory metrics to database
+		query = \
+			"INSERT INTO memory_metrics" \
+			"(producer_id, date_time, operating_system, ram_load_percentage," \
+			"swap_load_percentage)" \
+			" values " \
+			"('{}', NOW() AT TIME ZONE 'UTC', '{}', {}, {});".format(
+				metrics['content']['producer_id'],
+				metrics['content']['mac_id'],
+				metrics['content']['memory_metrics'][0],
+				metrics['content']['memory_metrics'][1]
+			)
+		logger.debug("Query: {}".format(query))
+		self.cursor.execute(query)
+		self.db_connection.commit()
+
+	def create_registration_entry(self, metrics) -> None:
+		"""
+		Take the data from the Kafka Topic and send it to the
+		database as a new operating system entry
+		:param metrics: A dict object containing the recorded
+			operating system and machine data
+		"""
+		self.cursor.execute("SELECT * FROM operating_systems WHERE id='{}'"
+							.format(metrics['content']['mac_id']))
+		result = self.cursor.fetchone()
+		logger.debug("OS Result: {}".format(result))
+		if not result:
+			query = \
+				"INSERT INTO operating_systems" \
+				"(id, name, release, architecture, version, processor, " \
+				"physical_cores, logical_cores, total_ram, total_swapspace)" \
+				"values" \
+				"('{}', '{}', '{}', '{}', '{}', '{}', {}, {}, {}, {});".format(
+					metrics['content']['mac_id'],
+					metrics['content']['os_name'],
+					metrics['content']['os_release'],
+					metrics['content']['os_architecture'],
+					metrics['content']['os_version'],
+					metrics['content']['processor'],
+					metrics['content']['cpu_physical_cores'],
+					metrics['content']['cpu_logical_cores'],
+					metrics['content']['total_ram'],
+					metrics['content']['total_swap_space'],
+				)
+			logger.debug("Query: {}".format(query))
+			self.cursor.execute(query)
+			self.db_connection.commit()
+
+	def stop(self) -> None:
+		"""
+		Close consumer connection and cleanup
+		"""
 		self.consumer.close()
