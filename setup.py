@@ -13,7 +13,7 @@ with open('requirements.txt') as requirements_file:
 			requirements.remove(requirement)
 
 setuptools.setup(
-	name="OS Metrics",
+	name="os-pmetrics",
 	version="0.1",
 	author="Artem Semenov",
 	packages=setuptools.find_packages(),
