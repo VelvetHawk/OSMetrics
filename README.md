@@ -41,7 +41,7 @@ by using:
 ```
 python -m os_metrics
 ```
-Currently to set to run for ~10 seconds
+Currently set to run for ~10 seconds
 before exiting.
 
 ## Testing
