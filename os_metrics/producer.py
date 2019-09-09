@@ -53,20 +53,20 @@ class Producer:
 		self.total_ram = psutil.virtual_memory().total
 		self.total_swap_space = psutil.swap_memory().total
 
-	def get_cpu_metrics(self):
+	def get_cpu_metrics(self) -> None:
 		"""
 		Gets the utilisation percentage and temperature for each CPU
 		"""
 		self.cpu_percentages = psutil.cpu_percent(interval=1, percpu=True)
 
-	def get_memory_metrics(self):
+	def get_memory_metrics(self) -> None:
 		"""
 		Gets the utilisation percentage for both virtual memory and
 		swap space on the target OS
 		"""
 		self.memory_percentages = [psutil.virtual_memory().percent, psutil.swap_memory().percent]
 
-	def register_machine(self):
+	def register_machine(self) -> None:
 		"""
 		Sends a message to the Kafka topic about the current machine. Uses the
 		'registration' type to let the consumer know that this is a new entry
@@ -91,7 +91,7 @@ class Producer:
 		self.producer.send(self.kafka_topic, json.dumps(message).encode("utf-8"))
 		self.producer.flush()
 
-	def send_metrics(self):
+	def send_metrics(self) -> None:
 		"""
 		Collect metrics and send them to the given Kafka Topic. Uses
 		'log' type to send log messages.
@@ -110,5 +110,8 @@ class Producer:
 		self.producer.send(self.kafka_topic, json.dumps(message).encode("utf-8"))
 		self.producer.flush()
 
-	def stop(self):
+	def stop(self) -> None:
+		"""
+		Close producer connection and cleanup
+		"""
 		self.producer.close(timeout=None)
