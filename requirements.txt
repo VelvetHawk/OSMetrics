@@ -1,5 +1,5 @@
 # Cross-platform library for monitoring systems and processes
-psutil==5.6.3
+psutil==5.6.6
 # Apache kafka support in python
 kafka-python==1.4.6
 # adapter for connecting to PostgreSQL
